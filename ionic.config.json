@@ -1,0 +1,7 @@
+{
+  "name": "lost",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
