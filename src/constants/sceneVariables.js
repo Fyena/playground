@@ -77,10 +77,24 @@ export default new class {
                     y: -228,
                     size: 30,
                     direction: 0,
-                    interactions: [0, 1],
+                    interactions: [0, 1, 2],
                     pathIndex: 0,
                 }
             ]
+        },
+        {
+            id: 4,
+            name: 'Battle',
+            x: -330,
+            y: -300,
+            movement: 16,
+            scale: 3,
+            imageSource: '/assets/img/battle.jpg',
+            musicSource: '/assets/mp3/battle.mp3',
+            musicVolume: 0,
+            night: false,
+            facing: 1,
+            npcs: []
         }
     ]
 }

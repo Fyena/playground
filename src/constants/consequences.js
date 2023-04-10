@@ -3,7 +3,7 @@ import service from '../services/service';
 export default async function (consequence, choiceIndex, choiceTextInput, choiceData){
     // Check if username is taken or not
     if (consequence === 0) {
-        const result = await service.test();
+        const result = await service.checkUsernameTaken(choiceTextInput);
         if (result.data === true) {
             return {success: false, error: 'Username already taken'};
         }
@@ -46,6 +46,16 @@ export default async function (consequence, choiceIndex, choiceTextInput, choice
         } catch (error) {
             return {success: false, error: 'Invalid information', choiceAfterError: 0};
         }
-
+    }
+    // Attack
+    if (consequence === 4) {
+        try {
+            const result = await service.attackAnimal(choiceIndex);
+            console.log(result);
+            console.log('successs!!!');
+            return {success: true, fightResponse: result};
+        } catch (error) {
+            return {success: false, error: 'Something went wrong'};
+        }
     }
 }

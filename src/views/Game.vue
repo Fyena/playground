@@ -7,14 +7,33 @@
         <audio id='audio3'></audio>
         <audio id='audio4'></audio>
         <input id='mainInput' class='opacity-0 absolute z-50 w-screen h-screen scale-100 hover:cursor-default' @keydown.w="this.move('w')" @keydown.a="this.move('a')" @keydown.s="this.move('s')" @keydown.d="this.move('d')" @keydown.enter="this.move('enter')" v-model="this.input" v-on:click='this.interact' autofocus>
-        <div class="absolute w-screen h-screen top-0 left-0 bg-no-repeat transition-all duration-200" :style="'background-position: ' + this.sceneX + 'px ' + this.sceneY + 'px;' + 'background-image: url('+ this.imageSource + '); transform: scale(' + this.scale + '); opacity: ' + this.opacity"></div>
-        <div v-for="npc in this.npcs" v-bind:key="npc.id" class="absolute w-screen h-screen top-0 left-0 bg-no-repeat transition-all duration-200" :style="'background-position: ' + (this.sceneX - npc.x) + 'px ' + (this.sceneY - npc.y) + 'px;' + 'background-image: url('+ npc.sprites[npc.direction] + '); transform: scale(' + this.scale + '); z-index: 2;'"></div>
+        <div class="absolute w-screen h-screen top-0 left-0 bg-no-repeat transition-all duration-200" :style="'background-position: ' + (this.sceneX + this.offsetX) + 'px ' + (this.sceneY + this.offsetY) + 'px;' + 'background-image: url('+ this.imageSource + '); transform: scale(' + this.scale + '); opacity: ' + this.opacity"></div>
+        <div v-for="npc in this.npcs" v-bind:key="npc.id" class="absolute w-screen h-screen top-0 left-0 bg-no-repeat transition-all duration-200" :style="'background-position: ' + (this.sceneX + this.offsetX - npc.x) + 'px ' + (this.sceneY + this.offsetY - npc.y) + 'px;' + 'background-image: url('+ npc.sprites[npc.direction] + '); transform: scale(' + this.scale + '); z-index: 2;'"></div>
+        <!-- Battle -->
+        <div v-if='this.battle' class='absolute top-0 left-0 h-screen w-screen'>
+        <!-- Animal 1 -->
+          <div class="absolute w-screen h-screen top-0 left-0 bg-no-repeat transition-all duration-200 z-50" :style="'background-position: ' + (this.sceneX + 150) + 'px ' + (this.sceneY + 200) + 'px;' + 'background-image: url(assets/animals/animal'+ this.battle.ownAnimals[this.fightingAnimalIndex].animalId + 'back.png); transform: scale(' + this.scale + '); z-index: 2;'"></div>
+          <div class="absolute transition-all duration-1000 z-50 w-[200px] bg-yellow-700 text-white border-4 border-yellow-600 p-2 rounded-xl font-2 text-xs flex flex-col" :style="'left: ' + (this.sceneX - 50) + 'px; top: ' + (this.sceneY + 100) + 'px; z-index: 2;'">
+            <span>{{this.battle.ownAnimals[this.fightingAnimalIndex].name}}</span><span class='text-right px-2'> Lv. {{this.battle.ownAnimals[this.fightingAnimalIndex].level}}</span>
+            <span>HP: {{this.battle.ownAnimals[this.fightingAnimalIndex].health ?? (Math.floor(this.battle.ownAnimals[this.fightingAnimalIndex].healthPerLevel * this.battle.ownAnimals[this.fightingAnimalIndex].level + this.battle.ownAnimals[this.fightingAnimalIndex].baseHealth))}} / {{Math.floor(this.battle.ownAnimals[this.fightingAnimalIndex].healthPerLevel * this.battle.ownAnimals[this.fightingAnimalIndex].level + this.battle.ownAnimals[this.fightingAnimalIndex].baseHealth)}}</span>
+            <span>XP: {{this.battle.ownAnimals[this.fightingAnimalIndex].xp / this.battle.ownAnimals[this.fightingAnimalIndex].xpPerLevel * this.battle.ownAnimals[this.fightingAnimalIndex].level * 100}}%</span>
+          </div>
+        <!-- Animal 2 -->
+          <div class="absolute w-screen h-screen top-0 left-0 bg-no-repeat transition-all duration-200 z-50" :style="'background-position: ' + (this.sceneX + 390) + 'px ' + (this.sceneY + 80) + 'px;' + 'background-image: url(assets/animals/animal'+ this.battle.opponent.animalId + 'front.png); transform: scale(' + this.scale + '); z-index: 2;'"></div>
+          <div class="absolute transition-all duration-1000 z-50 w-[200px] bg-yellow-700 text-white border-4 border-yellow-600 p-2 rounded-xl font-2 text-xs flex flex-col" :style="'left: ' + (this.sceneX + 500) + 'px; top: ' + (this.sceneY - 150) + 'px; z-index: 2;'">
+            <span>{{this.battle.opponent.name}}</span><span class='text-right px-2'> Lv. {{this.battle.opponent.level}}</span>
+            <span>HP: {{this.battle.opponent.health}} / {{(this.battle.opponent.maxHealth)}}</span>
+          </div>
+        </div>
+        <!-- End battle -->
         <img v-if="this.showSprite" v-bind:src="spriteSource" class='w-12 h-12 absolute left-[50%] top-[50%] transition-all duration-200' :class="this.spriteScale" :style="'z-index: ' + this.spriteZIndex + ';'"/>
         <div class='absolute bg-black bg-opacity-50'>X: {{this.sceneX}} Y: {{this.sceneY}}</div>
         <div class='absolute top-6 bg-black bg-opacity-100 text-6xl text-red-700'>devX: {{this.devX}} devY: {{this.devY}}</div>
         <div class='absolute top-24 h-96 w-96 bg-black bg-opacity-50 overflow-y-scroll z-50'>Console:
           <div v-for='log in this.console' :key='log' class='border-t py-2'>{{log}}</div>
         </div>
+        <span class='absolute top-0 right-0 z-50'><input type='number' min='-10' max='10' v-model='this.offsetX'>{{this.offsetX}}</span>
+        <input type='number' min='-10' max='10' v-model='this.offsetY' class='absolute top-6 right-0 z-50'>
         <div class='absolute sm:w-1/2 w-screen sm:left-1/4 left-0 bottom-0 font-2 bg-yellow-700 bg-opacity-80 p-5 border-double border-4 border-yellow-600 transition-all duration-500 rounded min-h-[100px]' :class="this.chatMessageOpacity">
           <p v-if='!this.chatMessageInput'>{{this.chatMessage}}</p>
           <input id='choiceTextInput' :class='this.choiceInputType === 2 ? "block border-b bg-white bg-opacity-0 focus:border-b focus:outline-none" : "w-0 h-0 opacity-0"' v-model='this.choiceTextInput' type='text' @keydown.enter='this.move("enter")' />
@@ -36,7 +55,7 @@ import forbiddenAreas from '../constants/forbiddenAreas.js';
 import interactions from '../constants/interactions.js';
 import sceneVariables from '../constants/sceneVariables.js';
 import cutscenes from '../constants/cutscenes.js';
-import Service from '../services/service.js';
+import service from '../services/service.js';
 import consequences from '../constants/consequences.js';
 
 export default  defineComponent({
@@ -50,6 +69,8 @@ export default  defineComponent({
       opacity: 1,
       sceneX: -340,
       sceneY: -340,
+      offsetX: 0,
+      offsetY: 0,
       sceneId: 3,
       devX: -340,
       devY: -340,
@@ -94,6 +115,8 @@ export default  defineComponent({
       selectedChoice: 0,
       choiceData: [],
       action: undefined,
+      battle: undefined,
+      fightingAnimalIndex: 0,
     }
   },
   mounted() {
@@ -101,48 +124,48 @@ export default  defineComponent({
   },
   methods: {
     interact() {
-      this.log('a');
+      this.log(this.chatMessages);
       if (this.cutscenePlaying || this.choiceInputType > 0) {
         return;
       }
-            this.log('b');
+      this.log('a');
       if (this.chatMessages[this.chatMessageIndex]) {
-              this.log('c');
         if (!this.chatSkippable && !this.filledChatMessage) {
-                this.log('d');
           return;
         }
-              this.log('e');
+              this.log('b');
         if (!this.filledChatMessage) {
           this.instantFillChatMessage = true;
-                this.log('f');
           return;
         }
-              this.log('g');
+              this.log('c');
         this.chatMessage = '';
         if (this.chatMessages[this.chatMessageIndex + 1]) {
+                this.log('d');
+          this.chatMessageOpacity = 'opacity-1';
           this.chatMessageIndex++;
           this.fillChatMessage();
           this.filledChatMessage = false;
           this.instantFillChatMessage = false;
           this.playSound('chat');
-                this.log('h');
           return;
         } else {
-                this.log('i');
           this.chatMessageIndex = 0;
           this.chatMessages = [];
           this.chatMessageOpacity = 'opacity-0';
           this.chatSkippable = true;
           this.paused = false;
+                this.log('e');
           return;
         }
       }
+            this.log('f');
       // Check if and which npc is in front of player
       let targetNPC = undefined;
       if (this.npcs) {
         for (let i = 0; i < this.npcs.length; i++) {
           let npc = this.npcs[i];
+          this.log(npc);
           if (
             
             (this.facing === 0 && this.devX >= npc.x - npc.size * 0.5 && this.devX <= npc.x && this.devY + this.movement >= npc.y - npc.size * 1.5 + (-64 + npc.size) * 1.2 && this.devY + this.movement <= npc.y - npc.size + (-64 + npc.size) * 1.2) ||
@@ -161,6 +184,7 @@ export default  defineComponent({
           if (targetNPC) {
             this.npcs[targetNPC.id].direction = this.facing === 0 ? 1 : this.facing === 1 ? 0 : this.facing === 2 ? 3 : 2;
           }
+          this.log(action);
           if (this.lockedDialogs.includes(action.name)) {
             continue;
           }
@@ -171,6 +195,7 @@ export default  defineComponent({
             this.lockedDialogs.push(action.thisLocks[i]);
           }
           if (action.type === 'chat' || action.type === 'noise' || action.type === 'choice' || action.type === 'animal') {
+            this.log(action);
             this.chatSkippable = action.skippable;
             this.chatMessageIndex = 0;
             this.chatMessages = action.messages.length > 0 ? action.messages : action.choices;
@@ -197,9 +222,11 @@ export default  defineComponent({
               break;
             case 'choice':
               this.chatMessages = action.choices;
+              this.log('choice');
+              this.interact();
               break;
             case 'animal':
-              setTimeout(() => this.startAnimalFight(action.animalId), 1000);
+              setTimeout(() => this.startAnimalFight(action.animalFightId), 1000);
           }
           return;
         }
@@ -207,17 +234,24 @@ export default  defineComponent({
     },
     fillChatMessage() {
       setTimeout(() => {
+        this.log('y');
         if (this.instantFillChatMessage) {
           this.chatMessage = this.chatMessages[this.chatMessageIndex];
           this.filledChatMessage = true;
           this.instantFillChatMessage = false;
           return;
         }
+        this.log('z');
+        this.log(this.chatMessage);
+        this.log(this.chatMessages[this.chatMessageIndex].question);
         let mode = this.chatMessages[0].question ? 1 : 0; // 0 = use messages array, 1 = use choices array
+        this.log(mode);
         if (this.chatMessage.length < this.chatMessages[this.chatMessageIndex].length && mode === 0) {
+          this.log('v');
           this.chatMessage = this.chatMessage + this.chatMessages[this.chatMessageIndex][this.chatMessage.length];
           this.fillChatMessage();
         } else if (this.chatMessages[this.chatMessageIndex].question && this.chatMessage.length < this.chatMessages[this.chatMessageIndex].question.length && mode === 1) {
+          this.log('x');
           this.chatMessage = this.chatMessage + this.chatMessages[this.chatMessageIndex].question[this.chatMessage.length];
           this.fillChatMessage();
         }
@@ -314,6 +348,7 @@ export default  defineComponent({
         }
         switch(direction) {
           case 'a':
+            this.log('a');
             if (this.selectedChoice === 0) break;
             this.selectedChoice--;
             break;
@@ -323,6 +358,7 @@ export default  defineComponent({
             break;
           case 'enter': //submit choice
             this.submitChoice();
+            this.log('submitchoice');
             break;
         }
         return;
@@ -543,19 +579,6 @@ export default  defineComponent({
         this.npcLoop();
       }, Math.random() * 1000 + 1000);
     },
-    async auth(method) {
-      this.loginError = '';
-      try {
-        const result = await Service.auth(method, {username: this.username, password: this.password});
-        if (!result.data) {
-          this.loginError = 'Something went wrong';
-          return;
-        }
-        localStorage.setItem('accessToken', result.data);
-      } catch (error) {
-        this.loginError = error.response.data.message ?? 'Something went wrong';
-      }
-    },
     async submitChoice() {
       let choice = this.chatMessages[this.chatMessageIndex];
       if (choice.keepData) {
@@ -564,6 +587,10 @@ export default  defineComponent({
       if (choice.consequence > -1) {
         const result = await consequences(choice.consequence, this.selectedChoice, this.choiceTextInput, this.choiceData);
         if (result.success) {
+          if (result.fightResponse) {
+            this.fightResponse(result.fightResponse);
+            return;
+          }
           if (choice.resetDataAfterConsequence) {
             this.choiceData = [];
           }
@@ -620,12 +647,86 @@ export default  defineComponent({
       this.choiceInputType = 0;
       this.choices = [];
       this.interact();
+    },
+    async startAnimalFight(id) {
+      try {
+        this.chatMessageIndex = 0;
+        this.chatMessage = '';
+        const result = await service.startAnimalFight(id);
+        console.log(result);
+        this.stopMusic();
+        this.audio = false;
+        this.paused = true;
+        let scene = sceneVariables.sceneVariables[4];
+        console.log(scene);
+        if (scene.musicSource) {
+          this.playMusic(scene.musicSource, scene.musicVolume);
+        }
+        this.interactions = [];
+        setTimeout(() => {
+          this.opacity = 0;
+          this.imageSource = '';
+          this.showSprite = false;
+          this.npcs = [];
+        }, 2000);
+        setTimeout(() => {
+          if (scene.imageSource) {
+            this.imageSource = scene.imageSource;
+            this.sceneX = scene.x + screen.width * 0.5;
+            this.sceneY = scene.y + screen.height * 0.5;
+            this.scale = scene.scale;
+            this.opacity = 1
+          }
+        }, 4000);
+        setTimeout(() => {
+          this.battle = result.data;
+          this.fightBeginTurn();
+        }, 6000);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    fightBeginTurn() {
+      let animal = this.battle.ownAnimals[this.fightingAnimalIndex];
+      let choices = [animal.move1name];
+      if (animal.move2name) {
+        choices.push(animal.move2name);
+      }
+      if (animal.move3name) {
+        choices.push(animal.move3name);
+      }
+      if (animal.move4name) {
+        choices.push(animal.move4name);
+      }
+      this.chatMessages = [
+        {
+            id: 0,
+            question: "nothing",
+            choices: [],
+            inputType: 0,
+            nextChoice: [],
+            consequence: -1,
+            keepData: false,
+        },
+        {
+            id: 1,
+            question: "What does " + animal.name + " need to do?",
+            choices: choices,
+            inputType: 1,
+            nextChoice: [],
+            consequence: 4,
+            keepData: true,
+        },
+      ];
+      this.log(this.chatMessages);
+      setTimeout(() => this.interact(), 2000);
+    },
+    fightResponse(response) {
+      // chat messages in fight
+      const chatMessages = [
+
+      ]
     }
   },
-  startAnimalFight(id) {
-    this.pause = true;
-    const result = await service.startAnimalFight(id);
-    console.log(result);
-  }
 });
 </script>
